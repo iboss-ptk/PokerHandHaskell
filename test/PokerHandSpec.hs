@@ -22,3 +22,7 @@ spec =
         it "ties" $
           judge "Black: 2H 3D 5S 9C KD  White: 2D 3H 5C 9S KH" `shouldBe` "Tie."
 
+      context "when input is invalid" $
+        it "tells user that input is not valid" $
+          judge "random input" `shouldBe` "`random input` is not a valid input."
+

@@ -13,5 +13,8 @@ judge input
   | input == "Black: 2H 3D 5S 9C KD  White: 2C 3H 4S 8C KH"
     =  "Black wins. - with high card: 9"
 
-  | otherwise
+  | input == "Black: 2H 3D 5S 9C KD  White: 2D 3H 5C 9S KH" 
     = "Tie."
+
+  | otherwise
+    = "`" ++ input ++ "` is not a valid input."
