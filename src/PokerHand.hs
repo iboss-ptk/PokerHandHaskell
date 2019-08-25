@@ -1,6 +1,12 @@
 module PokerHand
-    ( judge
+    ( judge,
+      toCard,
+      Card(..),
+      Rank(..),
+      Suit(..)
     ) where
+
+import Data.List (splitAt)
 
 judge :: String -> String
 judge input
@@ -18,3 +24,61 @@ judge input
 
   | otherwise
     = "`" ++ input ++ "` is not a valid input."
+
+data Rank
+  = Ace
+  | Two
+  | Three
+  | Four
+  | Five
+  | Six
+  | Seven
+  | Eight
+  | Nine
+  | Ten
+  | Jack
+  | Queen
+  | King
+  deriving (Eq, Ord, Show)
+
+data Suit = Spade | Heart | Diamond | Club
+  deriving (Eq, Show)
+
+data Card = Card Rank Suit
+  deriving (Eq, Show)
+
+mapBy :: Eq a => [(a, b)] -> a -> Maybe b
+mapBy = flip lookup
+
+toSuit :: String -> Maybe Suit
+toSuit = mapBy [
+  ("S", Spade),
+  ("H", Heart),
+  ("D", Diamond),
+  ("C", Club)
+  ]
+
+toRank :: String -> Maybe Rank
+toRank = mapBy [
+  ("A", Ace),
+  ("2", Two),
+  ("3", Three),
+  ("4", Four),
+  ("5", Five),
+  ("6", Six),
+  ("7", Seven),
+  ("8", Eight),
+  ("9", Nine),
+  ("T", Ten),
+  ("J", Jack),
+  ("Q", Queen),
+  ("K", King)
+  ]
+
+toCard :: String -> Maybe Card
+toCard s = let
+  (rankString, suitString) = splitAt 1 s
+  rank = toRank rankString
+  suit = toSuit suitString
+  in
+    pure Card <*> rank <*> suit
