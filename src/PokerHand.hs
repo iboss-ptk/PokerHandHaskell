@@ -1,9 +1,11 @@
 module PokerHand
     ( judge,
       toCard,
+      toHand,
       Card(..),
       Rank(..),
-      Suit(..)
+      Suit(..),
+      Hand(..),
     ) where
 
 import Data.List (splitAt)
@@ -47,6 +49,9 @@ data Suit = Spade | Heart | Diamond | Club
 data Card = Card Rank Suit
   deriving (Eq, Show)
 
+data Hand = StraightFlush Rank
+  deriving (Eq, Show)
+
 mapBy :: Eq a => [(a, b)] -> a -> Maybe b
 mapBy = flip lookup
 
@@ -77,8 +82,17 @@ toRank = mapBy [
 
 toCard :: String -> Maybe Card
 toCard s = let
-  (rankString, suitString) = splitAt 1 s
-  rank = toRank rankString
-  suit = toSuit suitString
+    (rankString, suitString) = splitAt 1 s
+    rank = toRank rankString
+    suit = toSuit suitString
   in
     pure Card <*> rank <*> suit
+
+toHand :: [Card] -> Maybe Hand
+toHand [Card Ace Heart,
+        Card King Heart,
+        Card Queen Heart,
+        Card Jack Heart,
+        Card Ten Heart
+        ] = Just (StraightFlush Ace)
+toHand _ = Nothing

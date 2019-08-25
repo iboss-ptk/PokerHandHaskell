@@ -44,32 +44,57 @@ spec =
           ("Q", Queen),
           ("K", King)
           ]
-      in do
-        context "when rank is valid and ends with H" $
-          it "returns card in rank with heart suit" $ forM_ rankMapping $
-            \(rankString, rank) ->
-              toCard (rankString ++ "H") `shouldBe` (Just $ Card rank Heart)
+      in
+        do
+          context "when rank is valid and ends with H" $
+            it "returns card in rank with heart suit" $ forM_ rankMapping $
+              \(rankString, rank) ->
+                toCard (rankString ++ "H") `shouldBe` (Just $ Card rank Heart)
 
-        context "when rank is valid and ends with S" $
-          it "returns card in rank with spade suit" $ forM_ rankMapping $
-            \(rankString, rank) ->
-              toCard (rankString ++ "S") `shouldBe` (Just $ Card rank Spade)
+          context "when rank is valid and ends with S" $
+            it "returns card in rank with spade suit" $ forM_ rankMapping $
+              \(rankString, rank) ->
+                toCard (rankString ++ "S") `shouldBe` (Just $ Card rank Spade)
 
-        context "when rank is valid and ends with C" $
-          it "returns card in rank with club suit" $ forM_ rankMapping $
-            \(rankString, rank) ->
-              toCard (rankString ++ "C") `shouldBe` (Just $ Card rank Club)
+          context "when rank is valid and ends with C" $
+            it "returns card in rank with club suit" $ forM_ rankMapping $
+              \(rankString, rank) ->
+                toCard (rankString ++ "C") `shouldBe` (Just $ Card rank Club)
 
-        context "when rank is valid and ends with D" $
-          it "returns card in rank with diamond suit" $ forM_ rankMapping $
-            \(rankString, rank) ->
-              toCard (rankString ++ "D") `shouldBe` (Just $ Card rank Diamond)
+          context "when rank is valid and ends with D" $
+            it "returns card in rank with diamond suit" $ forM_ rankMapping $
+              \(rankString, rank) ->
+                toCard (rankString ++ "D") `shouldBe` (Just $ Card rank Diamond)
 
-        context "when the string does match neither rank or suit" $
-          it "returns Nothing" $ do
-              toCard "" `shouldBe` Nothing
-              toCard " " `shouldBe` Nothing
-              toCard "A" `shouldBe` Nothing
-              toCard "AHA" `shouldBe` Nothing
-              toCard "4X" `shouldBe` Nothing
-              toCard "garbage" `shouldBe` Nothing
+          context "when the string does match neither rank or suit" $
+            it "returns Nothing" $ do
+                toCard "" `shouldBe` Nothing
+                toCard " " `shouldBe` Nothing
+                toCard "A" `shouldBe` Nothing
+                toCard "AHA" `shouldBe` Nothing
+                toCard "4X" `shouldBe` Nothing
+                toCard "garbage" `shouldBe` Nothing
+
+    describe "toHand" $ do
+      context "when card count is not 5" $
+        it "returns Nothing" $ do
+          toHand [] `shouldBe` Nothing
+          toHand [Card Ace Heart] `shouldBe` Nothing
+          toHand [
+            Card Ace Heart,
+            Card Ace Spade,
+            Card Two Heart,
+            Card Queen Club,
+            Card Four Club,
+            Card King Heart
+            ] `shouldBe` Nothing
+
+      context "when cards are the same suit and value is consecutive" $
+        it "returns straight flush which is ranked by highest rank card" $ do
+          toHand [
+            Card Ace Heart,
+            Card King Heart,
+            Card Queen Heart,
+            Card Jack Heart,
+            Card Ten Heart
+            ] `shouldBe` (Just $ StraightFlush Ace)
