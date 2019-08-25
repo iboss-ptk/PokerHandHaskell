@@ -75,12 +75,12 @@ spec =
                 toCard "4X" `shouldBe` Nothing
                 toCard "garbage" `shouldBe` Nothing
 
-    describe "toHand" $ do
+    describe "determineHand" $ do
       context "when card count is not 5" $
         it "returns Nothing" $ do
-          toHand [] `shouldBe` Nothing
-          toHand [Card Ace Heart] `shouldBe` Nothing
-          toHand [
+          determineHand [] `shouldBe` Nothing
+          determineHand [Card Ace Heart] `shouldBe` Nothing
+          determineHand [
             Card Ace Heart,
             Card Ace Spade,
             Card Two Heart,
@@ -91,7 +91,7 @@ spec =
 
       context "when cards are the same suit and value is consecutive" $
         it "returns straight flush which is ranked by highest rank card" $ do
-          toHand [
+          determineHand [
             Card Ace Heart,
             Card King Heart,
             Card Queen Heart,

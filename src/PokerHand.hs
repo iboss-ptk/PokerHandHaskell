@@ -1,7 +1,7 @@
 module PokerHand
     ( judge,
       toCard,
-      toHand,
+      determineHand,
       Card(..),
       Rank(..),
       Suit(..),
@@ -88,11 +88,11 @@ toCard s = let
   in
     pure Card <*> rank <*> suit
 
-toHand :: [Card] -> Maybe Hand
-toHand [Card Ace Heart,
+determineHand :: [Card] -> Maybe Hand
+determineHand [Card Ace Heart,
         Card King Heart,
         Card Queen Heart,
         Card Jack Heart,
         Card Ten Heart
         ] = Just (StraightFlush Ace)
-toHand _ = Nothing
+determineHand _ = Nothing
