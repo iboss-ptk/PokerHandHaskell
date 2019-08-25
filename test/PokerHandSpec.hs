@@ -98,3 +98,11 @@ spec =
             Card Jack Heart,
             Card Ten Heart
             ] `shouldBe` (Just $ StraightFlush Ace)
+
+          determineHand [
+            Card King Club,
+            Card Queen Club,
+            Card Jack Club,
+            Card Ten Club,
+            Card Nine Club
+            ] `shouldBe` (Just $ StraightFlush King)

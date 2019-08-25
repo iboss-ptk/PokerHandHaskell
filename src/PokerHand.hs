@@ -8,7 +8,7 @@ module PokerHand
       Hand(..),
     ) where
 
-import Data.List (splitAt)
+import Data.List (splitAt, sort)
 
 judge :: String -> String
 judge input
@@ -28,8 +28,7 @@ judge input
     = "`" ++ input ++ "` is not a valid input."
 
 data Rank
-  = Ace
-  | Two
+  = Two
   | Three
   | Four
   | Five
@@ -41,7 +40,8 @@ data Rank
   | Jack
   | Queen
   | King
-  deriving (Eq, Ord, Show)
+  | Ace
+  deriving (Eq, Ord, Enum, Show)
 
 data Suit = Spade | Heart | Diamond | Club
   deriving (Eq, Show)
@@ -89,10 +89,16 @@ toCard s = let
     pure Card <*> rank <*> suit
 
 determineHand :: [Card] -> Maybe Hand
-determineHand [Card Ace Heart,
-        Card King Heart,
-        Card Queen Heart,
-        Card Jack Heart,
-        Card Ten Heart
-        ] = Just (StraightFlush Ace)
-determineHand _ = Nothing
+determineHand cs = if length cs == 5 then
+  let
+    ranks = (\(Card rank _) -> rank) <$> cs
+    suits = (\(Card _ suit) -> suit) <$> cs
+    allTheSameSuit = and ((== head suits) <$> suits)
+    possibleStraight = [ minimum ranks .. maximum ranks ]
+  in
+    if sort ranks == possibleStraight && allTheSameSuit then
+      Just $ StraightFlush $ maximum ranks
+    else
+      Nothing
+  else
+    Nothing
