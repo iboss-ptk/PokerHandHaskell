@@ -106,3 +106,21 @@ spec =
             Card Ten Club,
             Card Nine Club
             ] `shouldBe` (Just $ StraightFlush King)
+
+      context "when 4 out of 5 cards has same value" $
+        it "returns four of a kind which is ranked by value of those 4 cards" $ do
+          determineHand [
+            Card Ace Heart,
+            Card Ace Club,
+            Card Ace Spade,
+            Card Ace Diamond,
+            Card Ten Heart
+            ] `shouldBe` (Just $ FourOfAKind Ace)
+
+          determineHand [
+            Card Two Heart,
+            Card Two Spade,
+            Card Two Diamond,
+            Card King Diamond,
+            Card Two Club
+            ] `shouldBe` (Just $ FourOfAKind Two)
