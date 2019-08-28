@@ -124,3 +124,21 @@ spec =
             Card King Diamond,
             Card Two Club
             ] `shouldBe` (Just $ FourOfAKind Two)
+
+      context "when 3 cards has same value and other 2 forming pair" $
+        it "returns full house which is ranked by value of those 3 cards" $ do
+          determineHand [
+            Card Ace Heart,
+            Card Ace Club,
+            Card Ace Spade,
+            Card Ten Diamond,
+            Card Ten Heart
+            ] `shouldBe` (Just $ FullHouse Ace)
+
+          determineHand [
+            Card Nine Heart,
+            Card Six Club,
+            Card Six Heart,
+            Card Nine Club,
+            Card Nine Diamond
+            ] `shouldBe` (Just $ FullHouse Nine)

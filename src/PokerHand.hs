@@ -9,6 +9,7 @@ module PokerHand
     ) where
 
 import Data.List (splitAt, sort, group, maximumBy)
+import Control.Arrow ((&&&))
 
 judge :: String -> String
 judge input
@@ -52,6 +53,7 @@ data Card = Card Rank Suit
 data Hand
   = StraightFlush Rank
   | FourOfAKind Rank
+  | FullHouse Rank
   deriving (Eq, Show)
 
 mapBy :: Eq a => [(a, b)] -> a -> Maybe b
@@ -97,12 +99,14 @@ getSuit :: Card -> Suit
 getSuit (Card _ suit) = suit
 
 
-mostRepeatedRank :: [Card] -> (Rank, Int)
-mostRepeatedRank = let
-    countRepetition rs = (head rs, length rs)
+countRank :: [Rank] -> [(Rank, Int)]
+countRank = fmap (head &&& length) . group . sort
+
+mostRepeatedRank :: [Rank] -> (Rank, Int)
+mostRepeatedRank = maximumBy compareCount . countRank
+  where
     compareCount (_, c1) (_, c2) = compare c1 c2
-  in
-    maximumBy compareCount . fmap countRepetition . group . sort . fmap getRank
+
 
 determineHand :: [Card] -> Maybe Hand
 determineHand cs
@@ -113,11 +117,13 @@ determineHand cs
       suits = getSuit <$> cs
       allTheSameSuit = and ((== head suits) <$> suits)
       possibleStraight = [ minimum ranks .. maximum ranks ]
-      (mostRepeatedRankVal, mostRepeatedRankCount) = mostRepeatedRank cs
+      (mostRepeatedRankVal, mostRepeatedRankCount) = mostRepeatedRank ranks
     in
       if sort ranks == possibleStraight && allTheSameSuit then
         Just $ StraightFlush $ maximum ranks
       else if mostRepeatedRankCount == 4 then
         Just $ FourOfAKind mostRepeatedRankVal
+      else if sort (snd <$> countRank ranks) == [2, 3] then
+        Just $ FullHouse mostRepeatedRankVal
       else
         Nothing
