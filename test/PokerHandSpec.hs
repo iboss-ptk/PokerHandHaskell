@@ -142,3 +142,24 @@ spec =
             Card Nine Club,
             Card Nine Diamond
             ] `shouldBe` (Just $ FullHouse Nine)
+
+      context "when all cards are in the same suit" $
+        it "returns Flush with the whole suit since it's ranked like high card" $ do
+          let getRank = fmap $ \(Card rank _) -> rank
+          let cards = [
+                Card Two Heart,
+                Card King Heart,
+                Card Ace Heart,
+                Card Ten Heart,
+                Card Nine Heart
+                ]
+          determineHand cards `shouldBe` (Just $ Flush $ getRank cards)
+
+          let cards2 = [
+                Card Two Club,
+                Card Three Club,
+                Card Queen Club,
+                Card Ten Club,
+                Card Six Club
+                ]
+          determineHand cards2 `shouldBe` (Just $ Flush $ getRank cards2)
