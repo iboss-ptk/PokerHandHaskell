@@ -1,8 +1,8 @@
 module PokerHandSpec (spec) where
 
-import Test.Hspec
-import Control.Monad (forM_)
-import PokerHand
+import           Control.Monad (forM_)
+import           PokerHand
+import           Test.Hspec
 
 spec :: Spec
 spec =

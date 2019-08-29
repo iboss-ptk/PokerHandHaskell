@@ -7,10 +7,10 @@ module Paths_PokerHandHaskell (
     getDataFileName, getSysconfDir
   ) where
 
-import qualified Control.Exception as Exception
-import Data.Version (Version(..))
-import System.Environment (getEnv)
-import Prelude
+import qualified Control.Exception  as Exception
+import           Data.Version       (Version (..))
+import           Prelude
+import           System.Environment (getEnv)
 
 #if defined(VERSION_base)
 

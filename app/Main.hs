@@ -1,6 +1,6 @@
 module Main where
 
-import PokerHand
+import           PokerHand
 
 main :: IO ()
 main = do
