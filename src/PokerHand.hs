@@ -55,6 +55,7 @@ data Hand
   | FourOfAKind Rank
   | FullHouse Rank
   | Flush [Rank]
+  | Straight Rank
   deriving (Eq, Show)
 
 mapBy :: Eq a => [(a, b)] -> a -> Maybe b
@@ -128,5 +129,7 @@ determineHand cs
         Just $ FullHouse mostRepeatedRankVal
       else if allTheSameSuit then
         Just $ Flush ranks
+      else if sort ranks == possibleStraight then
+        Just $ Straight (maximum ranks)
       else
         Nothing
