@@ -165,7 +165,7 @@ spec =
           determineHand cards2 `shouldBe` (Just $ Flush $ getRank cards2)
 
       context "when all cards have consecutive ranks" $
-        it "returns straight with is ranked by value of the highest rank" $ do
+        it "returns straight which is ranked by value of the highest rank" $ do
           determineHand [
             Card Ace Heart,
             Card King Club,
@@ -181,3 +181,21 @@ spec =
             Card Jack Diamond,
             Card Seven Heart
             ] `shouldBe` (Just $ Straight Jack)
+
+      context "when only 3 cards has the same rank" $
+        it "returns three of a kind with the repeated rank" $ do
+          determineHand [
+            Card Ace Heart,
+            Card Ten Club,
+            Card Ten Spade,
+            Card Jack Diamond,
+            Card Ten Heart
+            ] `shouldBe` (Just $ ThreeOfAKind Ten)
+
+          determineHand [
+            Card Ace Heart,
+            Card Six Club,
+            Card Ten Spade,
+            Card Six Diamond,
+            Card Six Heart
+            ] `shouldBe` (Just $ ThreeOfAKind Six)
