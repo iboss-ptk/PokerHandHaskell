@@ -9,7 +9,7 @@ module PokerHand
     ) where
 
 import           Control.Arrow ((&&&))
-import           Data.List     (group, maximumBy, sort, sortOn, splitAt)
+import           Data.List     (group, sort, sortBy, sortOn, splitAt)
 
 judge :: String -> String
 judge input
@@ -108,11 +108,6 @@ getSuit (Card _ suit) = suit
 groupAndCount :: [Rank] -> [(Rank, Int)]
 groupAndCount = fmap (head &&& length) . group . sort
 
-mostRepeated :: [Rank] -> (Rank, Int)
-mostRepeated = maximumBy compareCount . groupAndCount
-  where
-    compareCount (_, c1) (_, c2) = compare c1 c2
-
 
 determineHand :: [Card] -> Maybe Hand
 determineHand cs
@@ -121,29 +116,39 @@ determineHand cs
     let
       ranks = getRank <$> cs
       suits = getSuit <$> cs
-      allTheSameSuit = and ((== head suits) <$> suits)
-      possibleStraight = [ minimum ranks .. maximum ranks ]
-      (mostRepeatedRank, mostRepeatedCount) = mostRepeated ranks
+      allSuitsAreTheSame = and ((== head suits) <$> suits)
+      allRanksAreConsecutive = sort ranks == [ minimum ranks .. maximum ranks ]
+      sortedRankByRepitition = sortOn snd (groupAndCount ranks)
+      rankRepititions = snd <$> sortedRankByRepitition
+      mostRepeatedRank = last (fst <$> sortedRankByRepitition)
     in
-      if sort ranks == possibleStraight && allTheSameSuit then
+      if allRanksAreConsecutive && allSuitsAreTheSame then
         StraightFlush (maximum ranks)
-      else if mostRepeatedCount == 4 then
+
+      else if rankRepititions == [1, 4] then
         FourOfAKind mostRepeatedRank
-      else if sort (snd <$> groupAndCount ranks) == [2, 3] then
+
+      else if rankRepititions == [2, 3] then
         FullHouse mostRepeatedRank
-      else if allTheSameSuit then
+
+      else if allSuitsAreTheSame then
         Flush ranks
-      else if sort ranks == possibleStraight then
+
+      else if allRanksAreConsecutive then
         Straight (maximum ranks)
-      else if mostRepeatedCount == 3 then
+
+      else if rankRepititions == [1, 1, 3] then
         ThreeOfAKind mostRepeatedRank
-      else if sort (snd <$> groupAndCount ranks) == [1, 2, 2] then
+
+      else if rankRepititions == [1, 2, 2] then
         let
-          [re, p1, p2] = fst <$> sortOn snd (groupAndCount ranks)
-          pairs = (maximum [p1, p2], minimum [p1, p2])
+          nonPairRank : pairRanks = fst <$> sortedRankByRepitition
+          [p1, p2] = sortBy (flip compare) pairRanks
         in
-          TwoPairs pairs re
-      else if sort (snd <$> groupAndCount ranks) == [1, 1, 1, 2] then
+          TwoPairs (p1, p2) nonPairRank
+
+      else if rankRepititions == [1, 1, 1, 2] then
           Pair mostRepeatedRank (filter (/= mostRepeatedRank) ranks)
+
       else
         HighCard ranks
