@@ -199,3 +199,21 @@ spec =
             Card Six Diamond,
             Card Six Heart
             ] `shouldBe` (Just $ ThreeOfAKind Six)
+
+      context "when there are 2 pairs of the same rank" $
+        it "returns two pairs with rank of the pairs and rank of the remaining" $ do
+          determineHand [
+            Card Ace Heart,
+            Card Ten Club,
+            Card Jack Diamond,
+            Card Ten Spade,
+            Card Jack Heart
+            ] `shouldBe` (Just $ TwoPairs (Jack, Ten) Ace)
+
+          determineHand [
+            Card Ten Heart,
+            Card Nine Club,
+            Card Six Diamond,
+            Card Six Spade,
+            Card Nine Heart
+            ] `shouldBe` (Just $ TwoPairs (Nine, Six) Ten)

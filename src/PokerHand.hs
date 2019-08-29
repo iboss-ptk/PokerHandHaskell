@@ -9,7 +9,7 @@ module PokerHand
     ) where
 
 import           Control.Arrow ((&&&))
-import           Data.List     (group, maximumBy, sort, splitAt)
+import           Data.List     (group, maximumBy, sort, sortOn, splitAt)
 
 judge :: String -> String
 judge input
@@ -57,6 +57,7 @@ data Hand
   | Flush [Rank]
   | Straight Rank
   | ThreeOfAKind Rank
+  | TwoPairs (Rank, Rank) Rank
   deriving (Eq, Show)
 
 mapBy :: Eq a => [(a, b)] -> a -> Maybe b
@@ -134,5 +135,11 @@ determineHand cs
         Just $ Straight (maximum ranks)
       else if mostRepeatedRankCount == 3 then
         Just $ ThreeOfAKind mostRepeatedRankVal
+      else if sort (snd <$> countRank ranks) == [1, 2, 2] then
+        let
+          [re, p1, p2] = fst <$> sortOn snd (countRank ranks)
+          pairs = (maximum [p1, p2], minimum [p1, p2])
+        in
+          Just $ TwoPairs pairs re
       else
         Nothing
