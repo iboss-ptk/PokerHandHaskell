@@ -105,11 +105,11 @@ getSuit :: Card -> Suit
 getSuit (Card _ suit) = suit
 
 
-countRank :: [Rank] -> [(Rank, Int)]
-countRank = fmap (head &&& length) . group . sort
+groupAndCount :: [Rank] -> [(Rank, Int)]
+groupAndCount = fmap (head &&& length) . group . sort
 
-mostRepeatedRank :: [Rank] -> (Rank, Int)
-mostRepeatedRank = maximumBy compareCount . countRank
+mostRepeated :: [Rank] -> (Rank, Int)
+mostRepeated = maximumBy compareCount . groupAndCount
   where
     compareCount (_, c1) (_, c2) = compare c1 c2
 
@@ -123,27 +123,27 @@ determineHand cs
       suits = getSuit <$> cs
       allTheSameSuit = and ((== head suits) <$> suits)
       possibleStraight = [ minimum ranks .. maximum ranks ]
-      (mostRepeatedRankVal, mostRepeatedRankCount) = mostRepeatedRank ranks
+      (mostRepeatedRank, mostRepeatedCount) = mostRepeated ranks
     in
       if sort ranks == possibleStraight && allTheSameSuit then
         StraightFlush (maximum ranks)
-      else if mostRepeatedRankCount == 4 then
-        FourOfAKind mostRepeatedRankVal
-      else if sort (snd <$> countRank ranks) == [2, 3] then
-        FullHouse mostRepeatedRankVal
+      else if mostRepeatedCount == 4 then
+        FourOfAKind mostRepeatedRank
+      else if sort (snd <$> groupAndCount ranks) == [2, 3] then
+        FullHouse mostRepeatedRank
       else if allTheSameSuit then
         Flush ranks
       else if sort ranks == possibleStraight then
         Straight (maximum ranks)
-      else if mostRepeatedRankCount == 3 then
-        ThreeOfAKind mostRepeatedRankVal
-      else if sort (snd <$> countRank ranks) == [1, 2, 2] then
+      else if mostRepeatedCount == 3 then
+        ThreeOfAKind mostRepeatedRank
+      else if sort (snd <$> groupAndCount ranks) == [1, 2, 2] then
         let
-          [re, p1, p2] = fst <$> sortOn snd (countRank ranks)
+          [re, p1, p2] = fst <$> sortOn snd (groupAndCount ranks)
           pairs = (maximum [p1, p2], minimum [p1, p2])
         in
           TwoPairs pairs re
-      else if sort (snd <$> countRank ranks) == [1, 1, 1, 2] then
-          Pair mostRepeatedRankVal (filter (/= mostRepeatedRankVal) ranks)
+      else if sort (snd <$> groupAndCount ranks) == [1, 1, 1, 2] then
+          Pair mostRepeatedRank (filter (/= mostRepeatedRank) ranks)
       else
         HighCard ranks
