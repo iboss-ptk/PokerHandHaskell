@@ -235,3 +235,21 @@ spec =
             Card Seven Heart,
             Card Three Spade
             ] `shouldBe` (Just $ Pair Seven [Five, Ten, Three])
+
+      context "when it's does'nt have stright, flush or repeated ranks" $
+        it "returns high card with all the ranks" $ do
+          determineHand [
+            Card Ace Heart,
+            Card Five Club,
+            Card Seven Diamond,
+            Card Jack Heart,
+            Card Ten Spade
+            ] `shouldBe` (Just $ HighCard [Ace, Five, Seven, Jack, Ten])
+
+          determineHand [
+            Card Two Heart,
+            Card Jack Heart,
+            Card Six Diamond,
+            Card Nine Spade,
+            Card Four Club
+            ] `shouldBe` (Just $ HighCard [Two, Jack, Six, Nine, Four])

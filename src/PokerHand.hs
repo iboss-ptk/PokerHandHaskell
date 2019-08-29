@@ -59,6 +59,7 @@ data Hand
   | ThreeOfAKind Rank
   | TwoPairs (Rank, Rank) Rank
   | Pair Rank [Rank]
+  | HighCard [Rank]
   deriving (Eq, Show)
 
 mapBy :: Eq a => [(a, b)] -> a -> Maybe b
@@ -116,7 +117,7 @@ mostRepeatedRank = maximumBy compareCount . countRank
 determineHand :: [Card] -> Maybe Hand
 determineHand cs
   | length cs /= 5 = Nothing
-  | otherwise =
+  | otherwise = Just $
     let
       ranks = getRank <$> cs
       suits = getSuit <$> cs
@@ -125,24 +126,24 @@ determineHand cs
       (mostRepeatedRankVal, mostRepeatedRankCount) = mostRepeatedRank ranks
     in
       if sort ranks == possibleStraight && allTheSameSuit then
-        Just $ StraightFlush (maximum ranks)
+        StraightFlush (maximum ranks)
       else if mostRepeatedRankCount == 4 then
-        Just $ FourOfAKind mostRepeatedRankVal
+        FourOfAKind mostRepeatedRankVal
       else if sort (snd <$> countRank ranks) == [2, 3] then
-        Just $ FullHouse mostRepeatedRankVal
+        FullHouse mostRepeatedRankVal
       else if allTheSameSuit then
-        Just $ Flush ranks
+        Flush ranks
       else if sort ranks == possibleStraight then
-        Just $ Straight (maximum ranks)
+        Straight (maximum ranks)
       else if mostRepeatedRankCount == 3 then
-        Just $ ThreeOfAKind mostRepeatedRankVal
+        ThreeOfAKind mostRepeatedRankVal
       else if sort (snd <$> countRank ranks) == [1, 2, 2] then
         let
           [re, p1, p2] = fst <$> sortOn snd (countRank ranks)
           pairs = (maximum [p1, p2], minimum [p1, p2])
         in
-          Just $ TwoPairs pairs re
+          TwoPairs pairs re
       else if sort (snd <$> countRank ranks) == [1, 1, 1, 2] then
-          Just $ Pair mostRepeatedRankVal (filter (/= mostRepeatedRankVal) ranks)
+          Pair mostRepeatedRankVal (filter (/= mostRepeatedRankVal) ranks)
       else
-        Nothing
+        HighCard ranks
