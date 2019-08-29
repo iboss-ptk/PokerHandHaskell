@@ -58,6 +58,7 @@ data Hand
   | Straight Rank
   | ThreeOfAKind Rank
   | TwoPairs (Rank, Rank) Rank
+  | Pair Rank [Rank]
   deriving (Eq, Show)
 
 mapBy :: Eq a => [(a, b)] -> a -> Maybe b
@@ -141,5 +142,7 @@ determineHand cs
           pairs = (maximum [p1, p2], minimum [p1, p2])
         in
           Just $ TwoPairs pairs re
+      else if sort (snd <$> countRank ranks) == [1, 1, 1, 2] then
+          Just $ Pair mostRepeatedRankVal (filter (/= mostRepeatedRankVal) ranks)
       else
         Nothing
