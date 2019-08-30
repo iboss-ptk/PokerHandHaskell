@@ -2,6 +2,7 @@ module PokerHand
     ( judge,
       toCard,
       determineHand,
+      compareHand,
       Card(..),
       Rank(..),
       Suit(..),
@@ -60,7 +61,7 @@ data Hand
   | TwoPairs (Rank, Rank) Rank
   | Pair Rank [Rank]
   | HighCard [Rank]
-  deriving (Eq, Show)
+  deriving (Eq, Ord, Show)
 
 mapBy :: Eq a => [(a, b)] -> a -> Maybe b
 mapBy = flip lookup
@@ -131,10 +132,10 @@ determineHand cs
       else if rankRepititions == [2, 3] then
         FullHouse mostRepeatedRank
 
-      else if allSuitsAreTheSame then
+      else if allSuitsAreTheSame && not allRanksAreConsecutive then
         Flush ranks
 
-      else if allRanksAreConsecutive then
+      else if allRanksAreConsecutive && not allSuitsAreTheSame then
         Straight (maximum ranks)
 
       else if rankRepititions == [1, 1, 3] then
@@ -152,3 +153,8 @@ determineHand cs
 
       else
         HighCard ranks
+
+
+compareHand :: Hand -> Hand -> Ordering
+compareHand (StraightFlush r1) (StraightFlush r2) = compare r1 r2
+compareHand a b                                   = compare a b

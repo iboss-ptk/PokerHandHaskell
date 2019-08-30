@@ -1,6 +1,7 @@
 module PokerHandSpec (spec) where
 
 import           Control.Monad (forM_)
+import           Data.List     (sortBy)
 import           PokerHand
 import           Test.Hspec
 
@@ -253,3 +254,26 @@ spec =
             Card Nine Spade,
             Card Four Club
             ] `shouldBe` (Just $ HighCard [Two, Jack, Six, Nine, Four])
+
+    describe "compareHand" $ do
+      context "when hand types are not the same" $
+        it "orders by hands only" $
+          let hands = [
+                StraightFlush Two,
+                FourOfAKind Six,
+                FullHouse Ten,
+                Flush [Ten, Five, Four, Six, Nine],
+                Straight Ace,
+                ThreeOfAKind King,
+                TwoPairs (Queen, Seven) Ace,
+                Pair Ace [Three, Two, Eight],
+                HighCard [Nine, Six, Seven, Jack, Queen]
+                ]
+          in
+            sortBy compareHand hands `shouldBe` hands
+
+      context "when both are straight flush" $
+        it "should be compared by their best rank" $ do
+          compareHand (StraightFlush Jack) (StraightFlush Two) `shouldBe` GT
+          compareHand (StraightFlush King) (StraightFlush Ace) `shouldBe` LT
+          compareHand (StraightFlush Ace) (StraightFlush Ace) `shouldBe` EQ
