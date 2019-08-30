@@ -277,3 +277,27 @@ spec =
           compareHand (StraightFlush Jack) (StraightFlush Two) `shouldBe` GT
           compareHand (StraightFlush King) (StraightFlush Ace) `shouldBe` LT
           compareHand (StraightFlush Ace) (StraightFlush Ace) `shouldBe` EQ
+
+      context "when both are four of a kind" $
+        it "should be compared by the rank the fours" $ do
+          compareHand (FourOfAKind Jack) (FourOfAKind Two) `shouldBe` GT
+          compareHand (FourOfAKind King) (FourOfAKind Ace) `shouldBe` LT
+          compareHand (FourOfAKind Ace) (FourOfAKind Ace) `shouldBe` EQ
+
+      context "when both are full house" $
+        it "should be compared by the rank the threes" $ do
+          compareHand (FullHouse Jack) (FullHouse Two) `shouldBe` GT
+          compareHand (FullHouse King) (FullHouse Ace) `shouldBe` LT
+          compareHand (FullHouse Ace) (FullHouse Ace) `shouldBe` EQ
+
+      context "when both are straight" $
+        it "should be compared by their best rank" $ do
+          compareHand (Straight Jack) (Straight Two) `shouldBe` GT
+          compareHand (Straight King) (Straight Ace) `shouldBe` LT
+          compareHand (Straight Ace) (Straight Ace) `shouldBe` EQ
+
+      context "when both are three of a kind" $
+        it "should be compared by the rank the threes" $ do
+          compareHand (ThreeOfAKind Jack) (ThreeOfAKind Two) `shouldBe` GT
+          compareHand (ThreeOfAKind King) (ThreeOfAKind Ace) `shouldBe` LT
+          compareHand (ThreeOfAKind Ace) (ThreeOfAKind Ace) `shouldBe` EQ

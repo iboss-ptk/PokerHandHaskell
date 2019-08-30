@@ -156,5 +156,4 @@ determineHand cs
 
 
 compareHand :: Hand -> Hand -> Ordering
-compareHand (StraightFlush r1) (StraightFlush r2) = compare r1 r2
-compareHand a b                                   = compare a b
+compareHand = compare
