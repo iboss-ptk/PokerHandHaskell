@@ -209,7 +209,7 @@ spec =
             Card Jack Diamond,
             Card Ten Spade,
             Card Jack Heart
-            ] `shouldBe` (Just $ TwoPairs (Jack, Ten) Ace)
+            ] `shouldBe` (Just $ TwoPairs (Ten, Jack) Ace)
 
           determineHand [
             Card Ten Heart,
@@ -217,7 +217,7 @@ spec =
             Card Six Diamond,
             Card Six Spade,
             Card Nine Heart
-            ] `shouldBe` (Just $ TwoPairs (Nine, Six) Ten)
+            ] `shouldBe` (Just $ TwoPairs (Six, Nine) Ten)
 
       context "when there is a pair of the same rank" $
         it "returns pair with rank of the pair and list of rank of remainings" $ do

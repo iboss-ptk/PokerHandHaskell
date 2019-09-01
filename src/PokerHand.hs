@@ -143,10 +143,9 @@ determineHand cs
 
       else if rankRepititions == [1, 2, 2] then
         let
-          nonPairRank : pairRanks = fst <$> sortedRankByRepitition
-          [p1, p2] = sortBy (flip compare) pairRanks
+          [nonPairRank, pairRank1, pairRank2] = fst <$> sortedRankByRepitition
         in
-          TwoPairs (p1, p2) nonPairRank
+          TwoPairs (pairRank1, pairRank2) nonPairRank
 
       else if rankRepititions == [1, 1, 1, 2] then
           Pair mostRepeatedRank (filter (/= mostRepeatedRank) ranks)
@@ -157,16 +156,17 @@ determineHand cs
 sortBest :: [Rank] -> [Rank]
 sortBest = sortBy (flip compare)
 
+bestFirst :: (Rank, Rank) -> (Rank, Rank)
+bestFirst (a, b) = if a > b then (a, b) else (b, a)
+
 compareHand :: Hand -> Hand -> Ordering
 compareHand (Flush rs) (Flush rs') = compare (sortBest rs) (sortBest rs')
 compareHand (HighCard rs) (HighCard rs') = compare (sortBest rs) (sortBest rs')
 compareHand (Pair r rs) (Pair r' rs') =
   compare r r' <>
   compare (sortBest rs) (sortBest rs')
-compareHand (TwoPairs (r1, r2) r) (TwoPairs (r1', r2') r') =
-  let
-    pr = if r1 > r2 then (r1, r2) else (r2, r1)
-    pr' = if r1' > r2' then (r1', r2') else (r2', r1')
-  in
-    compare (TwoPairs pr r) (TwoPairs pr' r')
+compareHand (TwoPairs pr r) (TwoPairs pr' r') =
+  compare
+    (TwoPairs (bestFirst pr) r)
+    (TwoPairs (bestFirst pr') r')
 compareHand h h' = compare h h'
