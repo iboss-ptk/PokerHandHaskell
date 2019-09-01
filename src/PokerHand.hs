@@ -154,6 +154,19 @@ determineHand cs
       else
         HighCard ranks
 
+sortBest :: [Rank] -> [Rank]
+sortBest = sortBy (flip compare)
 
 compareHand :: Hand -> Hand -> Ordering
-compareHand = compare
+compareHand (Flush rs) (Flush rs') = compare (sortBest rs) (sortBest rs')
+compareHand (HighCard rs) (HighCard rs') = compare (sortBest rs) (sortBest rs')
+compareHand (Pair r rs) (Pair r' rs') =
+  compare r r' <>
+  compare (sortBest rs) (sortBest rs')
+compareHand (TwoPairs (r1, r2) r) (TwoPairs (r1', r2') r') =
+  let
+    pr = if r1 > r2 then (r1, r2) else (r2, r1)
+    pr' = if r1' > r2' then (r1', r2') else (r2', r1')
+  in
+    compare (TwoPairs pr r) (TwoPairs pr' r')
+compareHand h h' = compare h h'

@@ -272,32 +272,82 @@ spec =
           in
             sortBy compareHand hands `shouldBe` hands
 
-      context "when both are straight flush" $
-        it "should be compared by their best rank" $ do
-          compareHand (StraightFlush Jack) (StraightFlush Two) `shouldBe` GT
-          compareHand (StraightFlush King) (StraightFlush Ace) `shouldBe` LT
-          compareHand (StraightFlush Ace) (StraightFlush Ace) `shouldBe` EQ
+      forM_ [ (StraightFlush, "straight flush", "their best rank")
+            , (FourOfAKind, "four of a kind", "rank of the fours")
+            , (FullHouse, "full house", "rank of the threes")
+            , (Straight, "stright", "their best rank")
+            , (ThreeOfAKind, "three of a kind", "rank of the threes")
+            ] $
+        \(hand, handName, comparison) ->
+          context ("when both are " ++ handName) $
+            it ("should be compared by " ++ comparison) $ do
+              compareHand (hand Jack) (hand Two) `shouldBe` GT
+              compareHand (hand King) (hand Ace) `shouldBe` LT
+              compareHand (hand Ace) (hand Ace) `shouldBe` EQ
 
-      context "when both are four of a kind" $
-        it "should be compared by the rank the fours" $ do
-          compareHand (FourOfAKind Jack) (FourOfAKind Two) `shouldBe` GT
-          compareHand (FourOfAKind King) (FourOfAKind Ace) `shouldBe` LT
-          compareHand (FourOfAKind Ace) (FourOfAKind Ace) `shouldBe` EQ
 
-      context "when both are full house" $
-        it "should be compared by the rank the threes" $ do
-          compareHand (FullHouse Jack) (FullHouse Two) `shouldBe` GT
-          compareHand (FullHouse King) (FullHouse Ace) `shouldBe` LT
-          compareHand (FullHouse Ace) (FullHouse Ace) `shouldBe` EQ
+      forM_ [ (Flush, "flush")
+            , (HighCard, "high card")
+            , (Pair King, "pair with same rank")
+            ] $
+        \(hand, handName) ->
+          context ("when both are " ++ handName) $ do
+            context "when best rank is not equal" $
+              it "should be compared by best rank" $ do
+                compareHand
+                  (hand [Two, Jack, Six, Three, Five])
+                  (hand [Five, Ten, Six, Two, Four, Eight])
+                  `shouldBe` GT
 
-      context "when both are straight" $
-        it "should be compared by their best rank" $ do
-          compareHand (Straight Jack) (Straight Two) `shouldBe` GT
-          compareHand (Straight King) (Straight Ace) `shouldBe` LT
-          compareHand (Straight Ace) (Straight Ace) `shouldBe` EQ
+                compareHand
+                  (hand [Two, Jack, Six, Three, Five])
+                  (hand [Five, Ten, King, Two, Four, Eight])
+                  `shouldBe` LT
 
-      context "when both are three of a kind" $
-        it "should be compared by the rank the threes" $ do
-          compareHand (ThreeOfAKind Jack) (ThreeOfAKind Two) `shouldBe` GT
-          compareHand (ThreeOfAKind King) (ThreeOfAKind Ace) `shouldBe` LT
-          compareHand (ThreeOfAKind Ace) (ThreeOfAKind Ace) `shouldBe` EQ
+            context "when best rank is equal" $
+              it "should be compared by next best rank" $ do
+                compareHand
+                  (hand [Two, Jack, Six, Three, Five])
+                  (hand [Five, Ten, Jack, Two, Four, Eight])
+                  `shouldBe` LT
+
+                compareHand
+                  (hand [Two, Jack, Eight, Four, Five])
+                  (hand [Five, Jack, Two, Three, Eight])
+                  `shouldBe` GT
+
+            context "when all ranks are equal" $
+              it "should be equal" $
+                compareHand
+                  (hand [Two, Jack, Eight, Four, Five])
+                  (hand [Five, Jack, Two, Four, Eight])
+                  `shouldBe` EQ
+
+    context "when both are pair with different pair rank" $ do
+      it "should be ranked by pair rank" $ do
+        compareHand
+          (Pair Queen [Ace, Three, Two])
+          (Pair Ten [Queen, Jack, King])
+          `shouldBe` GT
+
+        compareHand
+          (Pair Six [Ace, Three, Two])
+          (Pair Ten [Queen, Jack, King])
+          `shouldBe` LT
+
+    context "when both are two pairs" $ do
+      it "should be ranked by best pairs" $
+        compareHand
+          (TwoPairs (Six, Ace) Two)
+          (TwoPairs (Ten, Queen) Ten)
+          `shouldBe` GT
+      it "should be ranked by snd best pairs if best pairs are equal" $
+        compareHand
+          (TwoPairs (Six, Ace) Two)
+          (TwoPairs (Ace, Queen) Ten)
+          `shouldBe` LT
+      it "should be ranked by remaining card if both pairs are equal" $
+        compareHand
+          (TwoPairs (Queen, Ace) Two)
+          (TwoPairs (Ace, Queen) Ten)
+          `shouldBe` LT
